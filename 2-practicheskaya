@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #333;
+            transition: background-color 0.3s ease;
+        }
+
+        input:focus {
+            background-color: #e0e0e0;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #2e7d32;
+            font-size: 14px;
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Регистрация</h2>
+    
+    <form id="myForm" novalidate>
+        <!-- 1. ФИО -->
+        <div class="form-group">
+            <label for="fullName">ФИО</label>
+            <input type="text" id="fullName" name="fullName" placeholder="Введите ФИО">
+            <div class="error-message" id="error-fullName">Только буквы (лат/кир) и пробелы. Без цифр и символов.</div>
+        </div>
+
+        <!-- 2. Логин -->
+        <div class="form-group">
+            <label for="login">Логин</label>
+            <input type="text" id="login" name="login" placeholder="Введите логин">
+            <div class="error-message" id="error-login">Мин. 15 символов, латиница, заглавные и строчные, 1 спецсимвол, 3 цифры.</div>
+        </div>
+
+        <!-- 3. Email -->
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="text" id="email" name="email" placeholder="example@domain.com">
+            <div class="error-message" id="error-email">Только латиница, формат: имя@домен.</div>
+        </div>
+
+        <!-- 4. Возраст -->
+        <div class="form-group">
+            <label for="age">Возраст</label>
+            <input type="text" id="age" name="age" placeholder="Введите возраст">
+            <div class="error-message" id="error-age">Укажите возраст.</div>
+        </div>
+
+        <!-- 5. Пароль -->
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" placeholder="Введите пароль">
+            <div class="error-message" id="error-password">Мин. 15 символов, кириллица, заглавные и строчные, 1 спецсимвол, 3 цифры.</div>
+        </div>
+
+        <button type="submit">Отправить</button>
+        <div class="success-message" id="successMessage">Форма успешно отправлена!</div>
+    </form>
+</div>
+
+<script>
+    
+    // Регулярные выражения (RegEx)
+    const regexFullName = /^[A-Za-zА-Яа-яЁё]+(?:\s+[A-Za-zА-Яа-яЁё]+)*$/;
+    
+    // Логин: латиница, мин 15 символов, хотя бы 1 строчная, 1 заглавная, 3 цифры, 1 спецсимвол
+    const regexLogin = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d.*\d.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{15,}$/;
+    
+    // Email: латиница, имя, @, домен
+    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    // Возраст: от 18 до 99
+    const regexAge = /^(1[89]|[2-9]\d)$/;
+    
+    // Пароль: кириллица, мин 15 символов, 1 строчная, 1 заглавная, 3 цифры, 1 спецсимвол
+    const regexPassword = /^(?=.*[а-яё])(?=.*[А-ЯЁ])(?=.*\d.*\d.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[А-Яа-яЁё\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{15,}$/;
+
+    // Элементы формы
+    const form = document.getElementById('myForm');
+    const fullNameInput = document.getElementById('fullName');
+    const loginInput = document.getElementById('login');
+    const emailInput = document.getElementById('email');
+    const ageInput = document.getElementById('age');
+    const passwordInput = document.getElementById('password');
+    const successMessage = document.getElementById('successMessage');
+
+    // Функция для отображения ошибки
+    function showError(inputId, show) {
+        const errorElement = document.getElementById(`error-${inputId}`);
+        if (show) {
+            errorElement.style.display = 'block';
+            document.getElementById(inputId).style.backgroundColor = '#ffebee';
+        } else {
+            errorElement.style.display = 'none';
+            document.getElementById(inputId).style.backgroundColor = '#f0f0f0';
+        }
+    }
+
+    // Обработчик отправки формы
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Отменяет стандартную отправку
+        let isValid = true;
+        successMessage.style.display = 'none';
+
+        // 1. Валидация ФИО
+        if (!regexFullName.test(fullNameInput.value.trim())) {
+            showError('fullName', true);
+            isValid = false;
+        } else {
+            showError('fullName', false);
+        }
+
+        // 2. Валидация Логина
+        if (!regexLogin.test(loginInput.value)) {
+            showError('login', true);
+            isValid = false;
+        } else {
+            showError('login', false);
+        }
+
+        // 3. Валидация Email
+        if (!regexEmail.test(emailInput.value)) {
+            showError('email', true);
+            isValid = false;
+        } else {
+            showError('email', false);
+        }
+
+        // 4. Валидация Возраста
+        if (!regexAge.test(ageInput.value)) {
+            showError('age', true);
+            isValid = false;
+        } else {
+            showError('age', false);
+        }
+
+        // 5. Валидация Пароля
+        if (!regexPassword.test(passwordInput.value)) {
+            showError('password', true);
+            isValid = false;
+        } else {
+            showError('password', false);
+        }
+
+        // Если все поля валидны
+        if (isValid) {
+            successMessage.style.display = 'block';
+            form.reset(); // Очищаем форму
+            
+            // Сброс цветов после очистки
+            document.querySelectorAll('input').forEach(input => {
+                input.style.backgroundColor = '#f0f0f0';
+            });
+        }
+    });
+
+    // Скрытие ошибки при начале ввода
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', function() {
+            showError(this.id, false);
+        });
+    });
+</script>
+
+</body>
+</html>
